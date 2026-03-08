@@ -7,11 +7,43 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
 {
     public class NoAntiSkipEver : CodeMod
     {
+        public NgShips.ShipController Current_Ship;
+
         public override void OnRegistered(string modPath)
         {
             NgEvents.NgRaceEvents.OnShipSpawned += DisableAntiSkip;
+            NgEvents.NgRaceEvents.OnShipSpawned += DisableRecovery;
+            NgEvents.NgUiEvents.OnNewSongPlaying += ResetShip;
+
             DebugConsole.Log("[NoAntiSkipEver] i hate the antiskip!");
             DebugConsole.Log("[NoAntiSkipEver] i hate the antiskip!");
+        }
+
+        private void ResetShip(string name)
+        {
+            if (Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y <= -NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight)
+            {
+                Current_Ship.ShieldIntegrity = -1;
+                //DebugConsole.Log("HEIGHT: " + Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y.ToString());
+                //DebugConsole.Log("LIMIT: -" + NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight.ToString());
+            }
+        }
+
+        private void DisableRecovery(ShipController ship)
+        {
+            //List Sections = new List<NgTrackData.Section> /*{ NgTrackData.TrackManager.Instance.data.sections }*/;
+            //Sections = NgTrackData.TrackManager.Instance.data.sections;
+
+            Current_Ship = ship;
+
+            if (NoAntiSkipEverHUDOptions.ModMenuOptions.DisableRecoveryToggle == 1)
+            {
+                foreach (NgTrackData.Section section in NgTrackData.TrackManager.Instance.data.sections)
+                {
+                    section.AllowOutOfBounds = true;
+                }
+                //DebugConsole.Log("RECOVERY DISABLED");
+            }            
         }
 
         private void DisableAntiSkip(ShipController ship)
