@@ -13,20 +13,16 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
         {
             NgEvents.NgRaceEvents.OnShipSpawned += DisableAntiSkip;
             NgEvents.NgRaceEvents.OnShipSpawned += DisableRecovery;
-            NgEvents.NgUiEvents.OnNewSongPlaying += ResetShip;
+            NgEvents.NgRaceEvents.OnCountdownStart += SetupSelfDestructHook;
 
             DebugConsole.Log("[NoAntiSkipEver] i hate the antiskip!");
             DebugConsole.Log("[NoAntiSkipEver] i hate the antiskip!");
         }
 
-        private void ResetShip(string name)
+        private void SetupSelfDestructHook()
         {
-            if (Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y <= -NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight)
-            {
-                Current_Ship.ShieldIntegrity = -1;
-                //DebugConsole.Log("HEIGHT: " + Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y.ToString());
-                //DebugConsole.Log("LIMIT: -" + NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight.ToString());
-            }
+            GameObject NoAntiSkipEverMonoBehaviourHookObject = new GameObject("GlobalManager");
+            NoAntiSkipEverMonoBehaviourHookObject.AddComponent<SelfDestructMonoBehaviour>();
         }
 
         private void DisableRecovery(ShipController ship)
@@ -63,6 +59,24 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
             else
             {
                 DebugConsole.Log("[NoAntiSkipEver] Attempted to disable anti skip through the RaceManager, but there is no instance of RaceManager");
+            }
+        }
+    }
+
+    public class SelfDestructMonoBehaviour : MonoBehaviour
+    {
+        void Update()
+        {
+            ResetShip();
+        }
+
+        void ResetShip()
+        {
+            if ((NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].CurrentSection.InverseTransformPoint(NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].T.position).y <= -NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight) && (NgIo.NgIn.GetButton("Recenter VR", 0) || NgIo.NgIn.GetButtonDown("Recenter VR", 0)))
+            {
+                NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].ShieldIntegrity = -1;
+                //DebugConsole.Log("HEIGHT: " + Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y.ToString());
+                //DebugConsole.Log("LIMIT: -" + NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight.ToString());
             }
         }
     }

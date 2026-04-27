@@ -54,7 +54,7 @@ namespace NoAntiSkipEverHUDOptions
                 {
                     selector.Configure("Recovery Toggle", "Whether to enable or disable out-of-track-bounds recovery. Only for the most extreme skippers.\n\n" +
                         "NOTE: This also disables hoverpoint correction, making landing back onto the track from out of bounds significantly harder.\n\n" +
-                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. Skip to next song to self-destruct.",
+                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. PRESS OR HOLD WHATEVER KEY/BUTTON YOU HAVE BOUND TO \"Recenter VR\" TO SELF-DESTRUCT.",
                         DisableRecoveryToggle, null, "Recovery Enabled", "Recovery Disabled");
                 },
                 selector =>
