@@ -4,9 +4,11 @@ using NgShips;
 using UnityEngine;
 
 namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
-{
+{    
+
     public class NoAntiSkipEver : CodeMod
     {
+        public float Self_Destruct_Timer;
         public NgShips.ShipController Current_Ship;
 
         public override void OnRegistered(string modPath)
@@ -65,6 +67,8 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
 
     public class SelfDestructMonoBehaviour : MonoBehaviour
     {
+        public float Self_Destruct_Timer = 0f;
+
         void Update()
         {
             ResetShip();
@@ -72,11 +76,17 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
 
         void ResetShip()
         {
-            if ((NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].CurrentSection.InverseTransformPoint(NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].T.position).y <= -NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight) && (NgIo.NgIn.GetButton("Recenter VR", 0) || NgIo.NgIn.GetButtonDown("Recenter VR", 0)))
+            if (NgIo.NgIn.GetButton("Recenter VR", 0))
             {
-                NgData.Ships.Loaded[NgMp.NgPeer.MySpawnIndex].ShieldIntegrity = -1;
-                //DebugConsole.Log("HEIGHT: " + Current_Ship.CurrentSection.InverseTransformPoint(Current_Ship.T.position).y.ToString());
-                //DebugConsole.Log("LIMIT: -" + NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructHeight.ToString());
+                Self_Destruct_Timer += Time.deltaTime;
+                if (Self_Destruct_Timer >= NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructTimer)
+                {
+                    NgData.Ships.PlayerOneShip.ShieldIntegrity = -1;
+                }                
+            }
+            else
+            {
+                Self_Destruct_Timer = 0f;
             }
         }
     }

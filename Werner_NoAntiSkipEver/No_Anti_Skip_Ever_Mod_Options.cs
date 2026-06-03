@@ -31,7 +31,7 @@ namespace NoAntiSkipEverHUDOptions
         private string _configPath;
 
         public static int DisableRecoveryToggle;
-        public static int SelfDestructHeight;
+        public static float SelfDestructTimer;
 
         public override void OnRegistered(string ModLocation)
         {
@@ -54,7 +54,7 @@ namespace NoAntiSkipEverHUDOptions
                 {
                     selector.Configure("Recovery Toggle", "Whether to enable or disable out-of-track-bounds recovery. Only for the most extreme skippers.\n\n" +
                         "NOTE: This also disables hoverpoint correction, making landing back onto the track from out of bounds significantly harder.\n\n" +
-                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. PRESS OR HOLD WHATEVER KEY/BUTTON YOU HAVE BOUND TO \"Recenter VR\" TO SELF-DESTRUCT.",
+                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. HOLD WHATEVER KEY/BUTTON YOU HAVE BOUND TO \"Recenter VR\" TO SELF-DESTRUCT.",
                         DisableRecoveryToggle, null, "Recovery Enabled", "Recovery Disabled");
                 },
                 selector =>
@@ -62,15 +62,14 @@ namespace NoAntiSkipEverHUDOptions
                     DisableRecoveryToggle = selector.Value;
                 });
 
-            ModOptions.RegisterOption<NgBoxSlider>(false, ModID, SelectorCategory0, "SelfDestructHeight_ID",
+            ModOptions.RegisterOption<NgBoxSlider>(false, ModID, SelectorCategory0, "SelfDestructTimer_ID",
                 slider =>
                 {
-                    slider.Configure("Self-Destruct Minimum Height", "How many units below the track your ship should be before song change will trigger a self-destruct.\n\n" +
-                        "Recommended: >=10",
-                        " Units", SelfDestructHeight, 0, 100, 1);
+                    slider.Configure("Self Destruct Timer", "How many consecutive seconds you have to hold the self-destruct button down for in order to trigger a self-destruct. Setting this to 0 will allow you to self-destruct immediately when you press the self-destruct binding.\n\nNOTE: The self-destruct binding is the same as \"Recenter VR\". By default, \"Recenter VR\" is bound to 'R' on keyboards and the right stick button on gamepads. You may want to rebind this to your preference",
+                        " Seconds", SelfDestructTimer, 0.00f, 3.00f, 0.01f);
                 }, slider =>
                 {
-                    SelfDestructHeight = (int) slider.Value;
+                    SelfDestructTimer = slider.Value;
                 });
 
         }
@@ -82,7 +81,7 @@ namespace NoAntiSkipEverHUDOptions
             ini.Open(_configPath);
 
             DisableRecoveryToggle = ini.ReadValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);
-            SelfDestructHeight = ini.ReadValue("Settings", "SelfDestructHeight_ID", SelfDestructHeight);
+            SelfDestructTimer = (float)ini.ReadValue("Settings", "SelfDestructTimer_ID", SelfDestructTimer);
 
             ini.Close();
         }
@@ -94,7 +93,7 @@ namespace NoAntiSkipEverHUDOptions
             ini.Open(_configPath);
 
             ini.WriteValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);
-            ini.WriteValue("Settings", "SelfDestructHeight_ID", SelfDestructHeight);
+            ini.WriteValue("Settings", "SelfDestructTimer_ID", SelfDestructTimer);
 
             ini.Close();
         }
