@@ -76,13 +76,13 @@ namespace NoAntiSkipEver //Original mod by Werner, Lord of the Skips
 
         void ResetShip()
         {
-            if (NgIo.NgIn.GetButton("Recenter VR", 0))
+            if (Input.GetKey(NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructKey))
             {
                 Self_Destruct_Timer += Time.deltaTime;
                 if (Self_Destruct_Timer >= NoAntiSkipEverHUDOptions.ModMenuOptions.SelfDestructTimer)
                 {
-                    NgData.Ships.PlayerOneShip.ShieldIntegrity = -1;
-                }                
+                    NgData.Ships.PlayerOneShip.ShieldIntegrity = -1f;
+                }
             }
             else
             {

@@ -30,8 +30,12 @@ namespace NoAntiSkipEverHUDOptions
     {
         private string _configPath;
 
+        private static readonly KeyCode[] AllKeyCodes = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+        private static readonly string[] AllKeyCodeNames = Array.ConvertAll(AllKeyCodes, kc => kc.ToString());
+
         public static int DisableRecoveryToggle;
         public static float SelfDestructTimer;
+        public static KeyCode SelfDestructKey;
 
         public override void OnRegistered(string ModLocation)
         {
@@ -49,18 +53,29 @@ namespace NoAntiSkipEverHUDOptions
 
             string SelectorCategory0 = "Recovery Settings (WARNING: EXPERIMENTAL)";
 
+            ModOptions.RegisterOption<NgBoxSelector>(false, ModID, SelectorCategory0, "SelfDestructKey_ID",
+                selector =>
+                {
+                    selector.Configure("Self-Destruct Keybind", "Custom binding for self-destructing and forcing a respawn when you get stuck or fall out of bounds. Set to 'None' to leave this unbound/disabled.",
+                        SelfDestructKey);
+                    selector.SetOptions(Array.IndexOf(AllKeyCodes, SelfDestructKey), AllKeyCodeNames);
+                }, selector =>
+                {
+                    SelfDestructKey = AllKeyCodes[selector.Value];
+                });
+
             ModOptions.RegisterOption<NgBoxSelector>(false, ModID, SelectorCategory0, "DisableRecoveryToggle_ID",
                 selector =>
                 {
                     selector.Configure("Recovery Toggle", "Whether to enable or disable out-of-track-bounds recovery. Only for the most extreme skippers.\n\n" +
                         "NOTE: This also disables hoverpoint correction, making landing back onto the track from out of bounds significantly harder.\n\n" +
-                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. HOLD WHATEVER KEY/BUTTON YOU HAVE BOUND TO \"Recenter VR\" TO SELF-DESTRUCT.",
+                        "WARNING: If you mess up a skip, the recovery drone will be unable to save you. Hold the Self-Destruct key to respawn on the track surface.",
                         DisableRecoveryToggle, null, "Recovery Enabled", "Recovery Disabled");
                 },
                 selector =>
                 {
                     DisableRecoveryToggle = selector.Value;
-                });
+                });            
 
             ModOptions.RegisterOption<NgBoxSlider>(false, ModID, SelectorCategory0, "SelfDestructTimer_ID",
                 slider =>
@@ -80,7 +95,8 @@ namespace NoAntiSkipEverHUDOptions
 
             ini.Open(_configPath);
 
-            DisableRecoveryToggle = ini.ReadValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);
+            SelfDestructKey = (KeyCode)ini.ReadValue("Settings", "SelfDestructKey_ID", (int)SelfDestructKey);
+            DisableRecoveryToggle = ini.ReadValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);            
             SelfDestructTimer = (float)ini.ReadValue("Settings", "SelfDestructTimer_ID", SelfDestructTimer);
 
             ini.Close();
@@ -92,7 +108,8 @@ namespace NoAntiSkipEverHUDOptions
 
             ini.Open(_configPath);
 
-            ini.WriteValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);
+            ini.WriteValue("Settings", "SelfDestructKey_ID", (int)SelfDestructKey);
+            ini.WriteValue("Settings", "DisableRecoveryToggle_ID", DisableRecoveryToggle);            
             ini.WriteValue("Settings", "SelfDestructTimer_ID", SelfDestructTimer);
 
             ini.Close();
