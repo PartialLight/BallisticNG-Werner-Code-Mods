@@ -30,8 +30,39 @@ namespace NoAntiSkipEverHUDOptions
     {
         private string _configPath;
 
-        private static readonly KeyCode[] AllKeyCodes = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+        private static readonly HashSet<KeyCode> DeprecatedUnderPhysicalKeys = new HashSet<KeyCode>
+        {
+        KeyCode.Exclaim, KeyCode.DoubleQuote, KeyCode.Hash, KeyCode.Dollar,
+        KeyCode.Percent, KeyCode.Ampersand, KeyCode.LeftParen, KeyCode.RightParen,
+        KeyCode.Asterisk, KeyCode.Plus, KeyCode.Colon, KeyCode.Less,
+        KeyCode.Greater, KeyCode.Question, KeyCode.At, KeyCode.Caret,
+        KeyCode.Underscore, KeyCode.LeftCurlyBracket, KeyCode.Pipe,
+        KeyCode.RightCurlyBracket, KeyCode.Tilde, KeyCode.LeftWindows,
+        KeyCode.RightWindows, KeyCode.AltGr, KeyCode.Help, KeyCode.SysReq,
+        KeyCode.Break
+        };
+        
+        private static readonly KeyCode[] AllKeyCodes = BuildFilteredKeyCodes();
         private static readonly string[] AllKeyCodeNames = Array.ConvertAll(AllKeyCodes, kc => kc.ToString());
+
+        private static KeyCode[] BuildFilteredKeyCodes()
+        {
+            var result = new List<KeyCode>();
+            var seenValues = new HashSet<int>();
+
+            foreach (KeyCode value in Enum.GetValues(typeof(KeyCode)))
+            {
+                if (DeprecatedUnderPhysicalKeys.Contains(value))
+                    continue;
+
+                if (!seenValues.Add((int)value))
+                    continue;
+
+                result.Add(value);
+            }
+
+            return result.ToArray();
+        }
 
         public static int DisableRecoveryToggle;
         public static float SelfDestructTimer;
